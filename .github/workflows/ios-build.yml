@@ -38,13 +38,13 @@ jobs:
             -scheme iTorrent \
             -skipMacroValidation
 
-      - name: Compile Xcode Workspace
+      - name: Compile Mac Catalyst / iOS Workspace
         run: |
           xcodebuild build \
             -workspace iTorrent.xcworkspace \
             -scheme iTorrent \
             -configuration Debug \
-            -destination 'generic/platform=iOS Simulator' \
+            -destination 'platform=macOS,variant=Mac Catalyst' \
             -skipMacroValidation \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
