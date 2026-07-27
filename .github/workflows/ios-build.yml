@@ -11,28 +11,25 @@ jobs:
   build-and-compile:
     runs-on: macos-15
     steps:
-      - name: Checkout Code & Submodules
+      - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          fetch-depth: 0
 
-      - name: Select Latest Xcode
+      - name: Fetch Submodule Dependencies
         run: |
-          sudo xcode-select -s /Applications/Xcode.app
+          rm -rf Submodules/LibTorrent-Swift Submodules/MVVMFoundation Submodules/GCDWebServer Submodules/SwiftVLC iTorrent/Engine
+          git clone --depth 1 https://github.com/XITRIX/LibTorrent-Swift.git Submodules/LibTorrent-Swift
+          git clone --depth 1 https://github.com/XITRIX/MVVMFoundation.git Submodules/MVVMFoundation
+          git clone --depth 1 https://github.com/XITRIX/GCDWebServer.git Submodules/GCDWebServer
+          git clone --depth 1 https://github.com/XITRIX/SwiftVLC.git Submodules/SwiftVLC
+          git clone --depth 1 https://github.com/XITRIX/iTorrent-Engine.git iTorrent/Engine
+
+      - name: Select Xcode Version
+        run: |
+          sudo xcode-select -s /Applications/Xcode_16.2.app || sudo xcode-select -s /Applications/Xcode.app
           xcodebuild -version
 
-      - name: Cache CocoaPods / SPM Dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/Library/Caches/org.swift.swiftpm
-          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
-          restore-keys: |
-            ${{ runner.os }}-spm-
-
-      - name: Compile Xcode Workspace (Simulator Build)
+      - name: Compile Xcode Workspace
         run: |
-          set -o pipefail
           xcodebuild build \
             -workspace iTorrent.xcworkspace \
             -scheme iTorrent \
@@ -40,31 +37,4 @@ jobs:
             -sdk iphonesimulator \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            | xcbeautify || xcodebuild build \
-            -workspace iTorrent.xcworkspace \
-            -scheme iTorrent \
-            -configuration Debug \
-            -sdk iphonesimulator \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY=""
-
-      - name: Create IPA Build Artifact
-        run: |
-          mkdir -p build-output
-          xcodebuild archive \
-            -workspace iTorrent.xcworkspace \
-            -scheme iTorrent \
-            -configuration Release \
-            -sdk iphoneos \
-            -archivePath build-output/TorrentMediaPlayer.xcarchive \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY=""
-
-      - name: Upload Compiled Xcode Archive
-        uses: actions/upload-artifact@v4
-        with:
-          name: TorrentMediaPlayer-Compiled-Archive
-          path: build-output/TorrentMediaPlayer.xcarchive
