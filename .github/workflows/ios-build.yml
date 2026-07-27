@@ -22,6 +22,10 @@ jobs:
           git clone --depth 1 https://github.com/XITRIX/GCDWebServer.git Submodules/GCDWebServer
           git clone --depth 1 https://github.com/XITRIX/SwiftVLC.git Submodules/SwiftVLC
 
+      - name: Patch SwiftVLC Tools Version
+        run: |
+          sed -i '' 's/swift-tools-version: 6.3/swift-tools-version: 6.0/g' Submodules/SwiftVLC/Package.swift
+
       - name: Select Xcode Version
         run: |
           sudo xcode-select -s /Applications/Xcode_16.2.app || sudo xcode-select -s /Applications/Xcode.app
