@@ -16,12 +16,11 @@ jobs:
 
       - name: Fetch Submodule Dependencies
         run: |
-          rm -rf Submodules/LibTorrent-Swift Submodules/MVVMFoundation Submodules/GCDWebServer Submodules/SwiftVLC iTorrent/Engine
+          rm -rf Submodules/LibTorrent-Swift Submodules/MVVMFoundation Submodules/GCDWebServer Submodules/SwiftVLC
           git clone --depth 1 https://github.com/XITRIX/LibTorrent-Swift.git Submodules/LibTorrent-Swift
           git clone --depth 1 https://github.com/XITRIX/MVVMFoundation.git Submodules/MVVMFoundation
           git clone --depth 1 https://github.com/XITRIX/GCDWebServer.git Submodules/GCDWebServer
           git clone --depth 1 https://github.com/XITRIX/SwiftVLC.git Submodules/SwiftVLC
-          git clone --depth 1 https://github.com/XITRIX/iTorrent-Engine.git iTorrent/Engine
 
       - name: Select Xcode Version
         run: |
