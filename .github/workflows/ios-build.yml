@@ -31,6 +31,12 @@ jobs:
           sudo xcode-select -s /Applications/Xcode_16.2.app || sudo xcode-select -s /Applications/Xcode.app
           xcodebuild -version
 
+      - name: Resolve Swift Package Dependencies
+        run: |
+          xcodebuild -resolvePackageDependencies \
+            -workspace iTorrent.xcworkspace \
+            -scheme iTorrent
+
       - name: Compile Xcode Workspace
         run: |
           xcodebuild build \
