@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torrent Media Player - Automated Streaming</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3" fill="currentColor"></polygon>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <h1>Torrent Media Player</h1>
+                    <span class="badge">Auto-Sequential & Auto-Play</span>
+                </div>
+            </div>
+            <div class="status-pill" id="global-status">
+                <span class="pulse-dot active"></span>
+                <span id="status-text">Engine Ready</span>
+            </div>
+        </header>
+
+        <!-- Input Bar -->
+        <section class="input-section">
+            <div class="input-wrapper">
+                <input type="text" id="magnet-input" placeholder="Paste Magnet Link or Torrent URL..." value="magnet:?xt=urn:btih:dd8255edd6e911f2680c6c9677bfa8b1224308b7&dn=Big+Buck+Bunny+1080p+H264">
+                <button id="add-btn" class="btn primary">
+                    <span>Add & Stream</span>
+                </button>
+            </div>
+            <div class="preset-buttons">
+                <span class="preset-label">Quick Demos:</span>
+                <button class="preset-btn" data-preset="bunny">Big Buck Bunny (1080p MP4)</button>
+                <button class="preset-btn" data-preset="sintel">Sintel (4K MKV)</button>
+                <button class="preset-btn" data-preset="tears">Tears of Steel (720p AVI)</button>
+            </div>
+        </section>
+
+        <!-- Main Content Area -->
+        <main class="main-grid">
+            <!-- Video Player Window -->
+            <div class="player-card">
+                <div class="card-header">
+                    <h2>Automatic Video Player</h2>
+                    <span class="autoplay-tag" id="autoplay-indicator">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                        Auto-Play Active
+                    </span>
+                </div>
+                <div class="video-wrapper">
+                    <video id="media-player" controls poster="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg">
+                        <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+                        Your browser does not support HTML5 video.
+                    </video>
+                    <div class="video-overlay" id="video-overlay">
+                        <div class="spinner"></div>
+                        <p id="overlay-msg">Buffering initial sequential bytes...</p>
+                    </div>
+                </div>
+                <div class="now-playing">
+                    <span class="playing-title" id="current-title">Big Buck Bunny 1080p H264.mp4</span>
+                    <span class="playing-size" id="current-size">276.1 MB</span>
+                </div>
+            </div>
+
+            <!-- Dashboard / Status Controls -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h2>Torrent Engine Status</h2>
+                </div>
+
+                <!-- Feature Status Grid -->
+                <div class="feature-status-grid">
+                    <div class="feature-box active">
+                        <div class="feature-icon">⚡</div>
+                        <div class="feature-info">
+                            <h3>Sequential Mode</h3>
+                            <p id="seq-status">Auto-Forced (Piece 0 → N)</p>
+                        </div>
+                    </div>
+                    <div class="feature-box active" id="reconnect-box">
+                        <div class="feature-icon">🔄</div>
+                        <div class="feature-info">
+                            <h3>Peer Auto-Reconnect</h3>
+                            <p id="reconnect-status">Active (Re-announced 0s ago)</p>
+                        </div>
+                    </div>
+                    <div class="feature-box active">
+                        <div class="feature-icon">▶️</div>
+                        <div class="feature-info">
+                            <h3>VLC Auto-Launch</h3>
+                            <p id="vlc-status">Auto-Launch on 1% Buffer</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Realtime Stats -->
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">Download Speed</span>
+                        <span class="stat-value" id="dl-speed">4.8 MB/s</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Seeds / Peers</span>
+                        <span class="stat-value" id="peers-count">34 / 12</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Progress</span>
+                        <span class="stat-value" id="progress-percent">14.2%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Re-announces</span>
+                        <span class="stat-value" id="reannounce-count">3</span>
+                    </div>
+                </div>
+
+                <!-- Sequential Pieces Visualizer -->
+                <div class="pieces-section">
+                    <div class="pieces-header">
+                        <span>Sequential Piece Map (Start to Finish)</span>
+                        <span id="pieces-buffered">32 / 240 pieces</span>
+                    </div>
+                    <div class="pieces-grid" id="pieces-container">
+                        <!-- Dynamically filled with piece blocks -->
+                    </div>
+                </div>
+
+                <!-- Activity Log -->
+                <div class="log-section">
+                    <div class="log-header">Engine Event Log</div>
+                    <div class="log-terminal" id="log-terminal">
+                        <div class="log-entry info">[00:00:01] Engine initialized with Auto-Sequential and Peer Auto-Reconnect.</div>
+                        <div class="log-entry success">[00:00:02] Magnet link loaded: Big Buck Bunny 1080p.</div>
+                        <div class="log-entry action">[00:00:02] Forced Sequential Download: Enabled (Piece order: 0, 1, 2, 3...)</div>
+                        <div class="log-entry action">[00:00:03] PeerReconnectService: Tracker re-announced to 6 DHT hubs.</div>
+                        <div class="log-entry success">[00:00:04] 34 peers connected. Downloading initial sequential chunk...</div>
+                        <div class="log-entry highlight">[00:00:06] AutoPlayService: Initial playable buffer ready. Auto-launching fullscreen player!</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
